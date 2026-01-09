@@ -8,18 +8,20 @@
 <body>
 <h2>الدفع</h2>
 <button onclick="goHome()">🏠 العودة للصفحة الرئيسية</button>
-<input id="searchName" placeholder="ابحث بالاسم" oninput="filterPayments()">
 
-<table id="paymentTable">
-<tr><th>الاسم</th><th>الهاتف</th><th>رسم الاشتراك</th><th>الحالة</th><th>رقم إيصال</th><th>دفع / طباعة</th></tr>
+<input type="text" id="searchName" placeholder="بحث بالاسم">
+<button onclick="filterPayments()">🔍 بحث</button>
+
+<table id="paymentsTable">
+<tr>
+<th>الاسم</th><th>الهاتف</th><th>العنوان</th><th>رسم الاشتراك</th><th>الحالة</th><th>رقم إيصال</th><th>دفع</th><th>طباعة</th>
+</tr>
 </table>
 
-<script src="assets/js/crypto.js"></script>
-<script src="assets/js/auth.js"></script>
+<script src="assets/js/core.js"></script>
 <script src="assets/js/payments.js"></script>
 <script>
-if(!currentUser()) location.href="login.html";
-updatePaymentsTable();
+window.onload = updatePaymentsTable;
 </script>
 </body>
 </html>
