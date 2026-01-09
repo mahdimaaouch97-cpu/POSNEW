@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>إيصال دفع - FAST NET</title>
+<style>
+body{font-family: monospace; width:50mm; padding:5px; direction:rtl;}
+pre{white-space: pre-wrap;}
+</style>
+</head>
+<body>
+<pre id="receiptContent">
+FAST NET
+71346411 - 71338640
+
+رقم إيصال: -
+الاسم: -
+الهاتف: -
+المبلغ: -
+تاريخ: -
+</pre>
+
+<script>
+// يمكن استدعاؤه عند فتح نافذة الإيصال من payments.html أو receipts.html
+function printReceiptContent(name, phone, fee, receipt, date){
+  document.getElementById("receiptContent").textContent =
+`FAST NET
+71346411 - 71338640
+
+رقم إيصال: ${receipt}
+الاسم: ${name}
+الهاتف: ${phone}
+المبلغ: $${fee}
+تاريخ: ${date}`;
+  window.print();
+}
+</script>
+</body>
+</html>
