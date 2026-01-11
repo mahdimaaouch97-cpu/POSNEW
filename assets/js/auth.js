@@ -12,8 +12,8 @@ function login() {
         localStorage.setItem("loggedIn", "true");
         localStorage.setItem("user", username);
 
-        // مسار آمن
-        window.location.href = "/index.html";
+        // 🔥 إعادة توجيه ذكية بدون أخطاء مسار
+        window.location.href = window.location.origin + "/index.html";
     } else {
         error.innerText = "بيانات الدخول غير صحيحة";
     }
