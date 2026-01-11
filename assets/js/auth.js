@@ -1,20 +1,21 @@
-const USERS=[
-{user:"admin",pass:"admin123",role:"admin"},
-{user:"staff",pass:"staff123",role:"staff"}
-];
+// auth.js
 
-function login(){
-  const u=document.getElementById("username").value;
-  const p=document.getElementById("password").value;
-  const found=USERS.find(x=>x.user===u && x.pass===p);
-  if(!found){alert("بيانات خاطئة"); return;}
-  localStorage.setItem("currentUser",JSON.stringify(found));
-  location.href="index.html";
-}
+function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const error = document.getElementById("error");
 
-function currentUser(){return JSON.parse(localStorage.getItem("currentUser"));}
+    if (!username || !password) {
+        error.innerText = "يرجى إدخال اسم المستخدم وكلمة المرور";
+        return;
+    }
 
-function requireRole(role){
-  const u=currentUser();
-  if(!u || u.role!==role){alert("غير مصرح"); location.href="index.html";}
+    // بيانات دخول بسيطة (لاحقًا يمكن ربطها بقاعدة بيانات)
+    if (username === "admin" && password === "admin") {
+        localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("user", username);
+        window.location.href = "index.html";
+    } else {
+        error.innerText = "بيانات الدخول غير صحيحة";
+    }
 }
