@@ -14,15 +14,13 @@
     flex-wrap: wrap;
     align-items: center;
 }
-
 .subscribers-section form input,
 .subscribers-section form select {
     padding: 8px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    flex: 1 1 200px;
+    flex: 1 1 150px;
 }
-
 .subscribers-section form button {
     flex: 0 0 auto;
 }
@@ -50,18 +48,28 @@
 
 <form id="subscriberForm">
 <input type="text" id="subscriberName" placeholder="اسم المشترك" required>
+<input type="text" id="subscriberAddress" placeholder="العنوان" required>
 <select id="subscriberPackage" required>
 <option value="">اختر الباقة</option>
 </select>
+<input type="number" id="subscriberPaid" placeholder="المبلغ المدفوع ($)" min="0" required>
 <button type="submit">إضافة المشترك</button>
 </form>
+
+<button onclick="exportToCSV()">تصدير إلى Excel</button>
+<input type="file" id="importFile" accept=".csv" style="margin-left:10px;">
+<label for="importFile" style="cursor:pointer; color:blue;">استيراد من Excel</label>
 
 <table id="subscribersTable">
 <thead>
 <tr>
 <th>الرقم</th>
-<th>اسم المشترك</th>
+<th>الاسم</th>
+<th>العنوان</th>
 <th>الباقة</th>
+<th>سعر الاشتراك ($)</th>
+<th>المبلغ المدفوع ($)</th>
+<th>المبلغ المتبقي ($)</th>
 <th>الإجراءات</th>
 </tr>
 </thead>
@@ -75,7 +83,7 @@
 </footer>
 
 <script>
-// تحميل البيانات من LocalStorage
+// بيانات
 let subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
 let packages = JSON.parse(localStorage.getItem("packages")) || [];
 
@@ -85,19 +93,26 @@ packages.forEach(pkg => {
     const option = document.createElement("option");
     option.value = pkg.name;
     option.textContent = pkg.name;
+    option.dataset.price = pkg.price;
     packageSelect.appendChild(option);
 });
 
-// عرض المشتركين في الجدول
+// عرض المشتركين
 function renderSubscribers() {
     const tbody = document.querySelector("#subscribersTable tbody");
     tbody.innerHTML = "";
     subscribers.forEach((sub, index)=>{
+        const pkgPrice = packages.find(p=>p.name===sub.package)?.price || "0.00";
+        const remaining = (parseFloat(pkgPrice)-parseFloat(sub.paid || 0)).toFixed(2);
         const row = document.createElement("tr");
         row.innerHTML = `
         <td>${index+1}</td>
         <td>${sub.name}</td>
+        <td>${sub.address}</td>
         <td>${sub.package}</td>
+        <td>$${pkgPrice}</td>
+        <td>$${parseFloat(sub.paid).toFixed(2)}</td>
+        <td>$${remaining}</td>
         <td>
             <button onclick="editSubscriber(${index})">تعديل</button>
             <button onclick="deleteSubscriber(${index})">حذف</button>
@@ -108,18 +123,20 @@ function renderSubscribers() {
     localStorage.setItem("subscribers", JSON.stringify(subscribers));
 }
 
-// إضافة مشترك جديد عبر النموذج
+// إضافة مشترك جديد
 document.getElementById("subscriberForm").addEventListener("submit", function(e){
     e.preventDefault();
     const name = document.getElementById("subscriberName").value.trim();
+    const address = document.getElementById("subscriberAddress").value.trim();
     const pkg = document.getElementById("subscriberPackage").value;
+    const paid = parseFloat(document.getElementById("subscriberPaid").value);
 
-    if(!name || !pkg){
-        alert("يرجى إدخال الاسم واختيار الباقة!");
+    if(!name || !address || !pkg || isNaN(paid)){
+        alert("يرجى ملء جميع الحقول بشكل صحيح!");
         return;
     }
 
-    subscribers.push({name:name, package:pkg});
+    subscribers.push({name:name, address:address, package:pkg, paid:paid});
     renderSubscribers();
     this.reset();
 });
@@ -127,12 +144,46 @@ document.getElementById("subscriberForm").addEventListener("submit", function(e)
 // تعديل مشترك
 function editSubscriber(index){
     const sub = subscribers[index];
-    const newName = prompt("تعديل اسم المشترك:", sub.name);
-    if(!newName) return;
-    const newPkg = prompt("تعديل الباقة:", sub.package);
-    if(!newPkg) return;
-    subscribers[index] = {name:newName, package:newPkg};
-    renderSubscribers();
+    const editDiv = document.createElement("div");
+    editDiv.style = "position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.2); z-index:1000;";
+
+    editDiv.innerHTML = `
+    <h3>تعديل المشترك</h3>
+    <label>الاسم:</label><br>
+    <input type="text" id="editName" value="${sub.name}"><br><br>
+    <label>العنوان:</label><br>
+    <input type="text" id="editAddress" value="${sub.address}"><br><br>
+    <label>الباقة:</label><br>
+    <select id="editPackage">
+        ${packages.map(p=>`<option value="${p.name}" ${p.name===sub.package?'selected':''}>${p.name}</option>`).join('')}
+    </select><br><br>
+    <label>المبلغ المدفوع ($):</label><br>
+    <input type="number" id="editPaid" value="${sub.paid}" min="0"><br><br>
+    <button id="saveEdit">حفظ</button>
+    <button id="cancelEdit">إلغاء</button>
+    `;
+
+    document.body.appendChild(editDiv);
+
+    document.getElementById("saveEdit").onclick = function(){
+        const newName = document.getElementById("editName").value.trim();
+        const newAddress = document.getElementById("editAddress").value.trim();
+        const newPkg = document.getElementById("editPackage").value;
+        const newPaid = parseFloat(document.getElementById("editPaid").value);
+
+        if(!newName || !newAddress || !newPkg || isNaN(newPaid)){
+            alert("يرجى ملء جميع الحقول بشكل صحيح!");
+            return;
+        }
+
+        subscribers[index] = {name:newName, address:newAddress, package:newPkg, paid:newPaid};
+        renderSubscribers();
+        document.body.removeChild(editDiv);
+    };
+
+    document.getElementById("cancelEdit").onclick = function(){
+        document.body.removeChild(editDiv);
+    };
 }
 
 // حذف مشترك
@@ -143,7 +194,42 @@ function deleteSubscriber(index){
     }
 }
 
-// عند تحميل الصفحة
+// تصدير إلى CSV
+function exportToCSV(){
+    let csv = "الرقم,الاسم,العنوان,الباقة,سعر الاشتراك,المبلغ المدفوع,المبلغ المتبقي\n";
+    subscribers.forEach((sub,index)=>{
+        const pkgPrice = packages.find(p=>p.name===sub.package)?.price || "0.00";
+        const remaining = (parseFloat(pkgPrice)-parseFloat(sub.paid || 0)).toFixed(2);
+        csv += `${index+1},${sub.name},${sub.address},${sub.package},${pkgPrice},${parseFloat(sub.paid).toFixed(2)},${remaining}\n`;
+    });
+    const blob = new Blob([csv], {type:"text/csv"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "subscribers.csv";
+    a.click();
+}
+
+// استيراد من CSV
+document.getElementById("importFile").addEventListener("change", function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+        const lines = e.target.result.split("\n").slice(1); // تجاهل العنوان
+        lines.forEach(line=>{
+            if(!line.trim()) return;
+            const [ , name, address, pkg, price, paid, remaining ] = line.split(",");
+            if(name && pkg){
+                subscribers.push({name:name.trim(), address:address.trim(), package:pkg.trim(), paid:parseFloat(paid)});
+            }
+        });
+        renderSubscribers();
+    };
+    reader.readAsText(file);
+});
+
+// تحميل الجدول عند فتح الصفحة
 window.onload = renderSubscribers;
 </script>
 </body>
