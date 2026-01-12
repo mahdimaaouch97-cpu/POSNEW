@@ -16,8 +16,8 @@
     #controls {
       margin-bottom: 10px;
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
+      gap: 10px;
       align-items: center;
     }
     #subscribersTable {
@@ -31,3 +31,226 @@
       text-align: center;
     }
     #subscribersTable th {
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+    #subscribersTable tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+    }
+    .edit-btn { background-color: #28a745; }
+    .delete-btn { background-color: #dc3545; }
+    .delete-all-btn { background-color: #6c757d; }
+    .export-btn { background-color: #17a2b8; }
+    .import-btn { background-color: #ffc107; color: black; }
+    .add-btn { background-color: #007BFF; }
+    input[type="file"] { display: none; }
+    #searchInput, #addName, #addPhone, #addPlan, #addDate,
+    .edit-input { padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; }
+    #addForm, .editForm { display: none; gap: 5px; justify-content: center; margin-bottom: 10px; }
+    .save-btn { background-color: #28a745; }
+    .cancel-btn { background-color: #6c757d; }
+  </style>
+</head>
+<body>
+
+<h1>قائمة المشتركين</h1>
+
+<div id="controls">
+  <button class="delete-all-btn" onclick="deleteAll()">حذف جميع المشتركين</button>
+  <button class="export-btn" onclick="exportToExcel()">تصدير إلى Excel</button>
+  <label class="import-btn">
+    استيراد من Excel
+    <input type="file" id="fileInput" accept=".xlsx,.xls">
+  </label>
+  <input type="text" id="searchInput" placeholder="بحث بالاسم أو الباقة..." onkeyup="filterTable()">
+  <button class="add-btn" onclick="toggleAddForm()">إضافة مشترك</button>
+</div>
+
+<!-- نموذج إضافة مشترك -->
+<div id="addForm">
+  <input type="text" id="addName" placeholder="الاسم">
+  <input type="text" id="addPhone" placeholder="الهاتف">
+  <input type="text" id="addPlan" placeholder="الباقة">
+  <input type="date" id="addDate">
+  <button class="save-btn" onclick="addSubscriber()">حفظ</button>
+  <button class="cancel-btn" onclick="toggleAddForm()">إلغاء</button>
+</div>
+
+<table id="subscribersTable">
+  <thead>
+    <tr>
+      <th>رقم</th>
+      <th>الاسم</th>
+      <th>الهاتف</th>
+      <th>الباقة</th>
+      <th>تاريخ الاشتراك</th>
+      <th>الإجراءات</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+let subscribers = [
+  { id: 1, name: "محمد علي", phone: "71346411", plan: "باقة أساسية", date: "2026-01-01" },
+  { id: 2, name: "أحمد حسن", phone: "71338640", plan: "باقة متقدمة", date: "2026-01-05" },
+  { id: 3, name: "ليلى سمير", phone: "71340000", plan: "باقة VIP", date: "2026-01-08" }
+];
+
+const tbody = document.querySelector("#subscribersTable tbody");
+const fileInput = document.getElementById("fileInput");
+const addForm = document.getElementById("addForm");
+
+function renderTable() {
+  tbody.innerHTML = "";
+  subscribers.forEach(sub => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${sub.id}</td>
+      <td>${sub.name}</td>
+      <td>${sub.phone}</td>
+      <td>${sub.plan}</td>
+      <td>${sub.date}</td>
+      <td>
+        <button class="edit-btn" onclick="showEditForm(${sub.id}, this)">تعديل</button>
+        <button class="delete-btn" onclick="deleteSubscriber(${sub.id})">حذف</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function toggleAddForm() {
+  if(addForm.style.display === "none" || addForm.style.display === "") {
+    addForm.style.display = "flex";
+  } else {
+    addForm.style.display = "none";
+  }
+  clearAddForm();
+}
+
+function clearAddForm() {
+  document.getElementById("addName").value = "";
+  document.getElementById("addPhone").value = "";
+  document.getElementById("addPlan").value = "";
+  document.getElementById("addDate").value = "";
+}
+
+function addSubscriber() {
+  const name = document.getElementById("addName").value.trim();
+  const phone = document.getElementById("addPhone").value.trim();
+  const plan = document.getElementById("addPlan").value.trim();
+  const date = document.getElementById("addDate").value;
+  if(!name || !phone || !plan || !date) { alert("يرجى ملء جميع الحقول"); return; }
+
+  const id = subscribers.length ? Math.max(...subscribers.map(s=>s.id)) + 1 : 1;
+  subscribers.push({id, name, phone, plan, date});
+  renderTable();
+  toggleAddForm();
+}
+
+function deleteSubscriber(id) {
+  if(confirm("هل تريد حذف هذا المشترك؟")) {
+    subscribers = subscribers.filter(sub => sub.id !== id);
+    renderTable();
+  }
+}
+
+function deleteAll() {
+  if(confirm("هل تريد حذف جميع المشتركين؟")) {
+    subscribers = [];
+    renderTable();
+  }
+}
+
+// تعديل مشترك داخل الجدول
+function showEditForm(id, btn) {
+  const row = btn.parentElement.parentElement;
+  const sub = subscribers.find(s => s.id === id);
+  row.innerHTML = `
+    <td>${sub.id}</td>
+    <td><input type="text" class="edit-input" value="${sub.name}"></td>
+    <td><input type="text" class="edit-input" value="${sub.phone}"></td>
+    <td><input type="text" class="edit-input" value="${sub.plan}"></td>
+    <td><input type="date" class="edit-input" value="${sub.date}"></td>
+    <td>
+      <button class="save-btn" onclick="saveEdit(${id}, this)">حفظ</button>
+      <button class="cancel-btn" onclick="renderTable()">إلغاء</button>
+    </td>
+  `;
+}
+
+function saveEdit(id, btn) {
+  const row = btn.parentElement.parentElement;
+  const inputs = row.querySelectorAll(".edit-input");
+  subscribers = subscribers.map(sub => {
+    if(sub.id === id) {
+      return {
+        id,
+        name: inputs[0].value.trim(),
+        phone: inputs[1].value.trim(),
+        plan: inputs[2].value.trim(),
+        date: inputs[3].value
+      };
+    }
+    return sub;
+  });
+  renderTable();
+}
+
+function filterTable() {
+  const filter = document.getElementById("searchInput").value.toLowerCase();
+  Array.from(tbody.rows).forEach(row => {
+    const name = row.cells[1].textContent.toLowerCase();
+    const plan = row.cells[3].textContent.toLowerCase();
+    row.style.display = (name.includes(filter) || plan.includes(filter)) ? "" : "none";
+  });
+}
+
+function exportToExcel() {
+  const ws_data = [
+    ["رقم","الاسم","الهاتف","الباقة","تاريخ الاشتراك"],
+    ...subscribers.map(s => [s.id, s.name, s.phone, s.plan, s.date])
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "المشتركين");
+  XLSX.writeFile(wb, "subscribers.xlsx");
+}
+
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const data = new Uint8Array(evt.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    subscribers = rows.slice(1).map((r,i) => ({
+      id: r[0] || i+1,
+      name: r[1] || "",
+      phone: r[2] || "",
+      plan: r[3] || "",
+      date: r[4] || ""
+    }));
+    renderTable();
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+renderTable();
+</script>
+</body>
+</html>
