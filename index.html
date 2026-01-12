@@ -6,95 +6,69 @@
 <title>لوحة التحكم - FAST NET</title>
 <link rel="stylesheet" href="assets/css/style.css">
 <style>
-/* تخصيص البطاقات للوحة التحكم */
-.dashboard .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-    gap: 20px;
-    margin-top: 20px;
-}
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5; }
+header { background:#007bff; color:#fff; padding:20px; text-align:center; }
+header h1 { margin:0; }
+nav ul { display:flex; justify-content:center; list-style:none; padding:0; margin:10px 0 0; gap:10px; flex-wrap:wrap; }
+nav ul li a { color:#fff; text-decoration:none; padding:10px 15px; background:#0056b3; border-radius:5px; transition:0.3s; }
+nav ul li a:hover, nav ul li a.active { background:#003f7f; }
 
-.card {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
+.dashboard { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; padding:20px; }
+.card { background:#fff; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1); text-align:center; }
+.card h2 { margin:0 0 10px; font-size:2rem; color:#007bff; }
+.card p { margin:0; font-weight:bold; }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
+.quick-links { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:20px; }
+.quick-links a { flex:1 1 150px; padding:15px; background:#28a745; color:#fff; text-decoration:none; text-align:center; border-radius:8px; transition:0.3s; }
+.quick-links a:hover { background:#1e7e34; }
 
-.card h3 {
-    margin-bottom: 10px;
-    color: #007bff;
-}
-
-.card p {
-    font-size: 1.2em;
-    margin-bottom: 15px;
-}
-
-.card a {
-    display: inline-block;
-    background-color: #007bff;
-    color: #fff;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-.card a:hover {
-    background-color: #0056b3;
-}
+footer { text-align:center; padding:15px; background:#007bff; color:#fff; margin-top:20px; }
 </style>
 </head>
 <body>
+
 <header>
 <h1>لوحة التحكم - FAST NET</h1>
 <nav>
 <ul>
 <li><a href="index.html" class="active">الرئيسية</a></li>
 <li><a href="subscribers.html">المشتركين</a></li>
-<li><a href="payments.html">الدفع</a></li>
 <li><a href="packages.html">الباقات</a></li>
+<li><a href="payments.html">الدفع</a></li>
 <li><a href="receipts.html">الإيصالات</a></li>
+<li><a href="search.html">بحث المشتركين</a></li>
 <li><a href="report.html">التقارير</a></li>
-<li><a href="login.html">تسجيل الخروج</a></li>
 </ul>
 </nav>
 </header>
 
 <main>
 <section class="dashboard">
-<h2>نظرة عامة على النظام</h2>
+    <div class="card">
+        <h2 id="totalSubscribers">0</h2>
+        <p>عدد المشتركين</p>
+    </div>
+    <div class="card">
+        <h2 id="totalReceipts">0</h2>
+        <p>عدد الإيصالات</p>
+    </div>
+    <div class="card">
+        <h2 id="totalRevenue">$0.00</h2>
+        <p>إجمالي الإيرادات بالدولار</p>
+    </div>
+    <div class="card">
+        <h2 id="totalPackages">0</h2>
+        <p>عدد الباقات</p>
+    </div>
+</section>
 
-<div class="cards">
-    <div class="card">
-        <h3>المشتركين</h3>
-        <p id="totalSubscribers">0</p>
-        <a href="subscribers.html">عرض التفاصيل</a>
-    </div>
-    <div class="card">
-        <h3>الإيصالات</h3>
-        <p id="totalReceipts">0</p>
-        <a href="receipts.html">عرض التفاصيل</a>
-    </div>
-    <div class="card">
-        <h3>إجمالي الإيرادات ($)</h3>
-        <p id="totalRevenue">0.00</p>
-        <a href="report.html">عرض التقارير</a>
-    </div>
-    <div class="card">
-        <h3>الباقات</h3>
-        <p id="totalPackages">0</p>
-        <a href="packages.html">عرض التفاصيل</a>
-    </div>
-</div>
+<section class="quick-links">
+    <a href="subscribers.html">المشتركين</a>
+    <a href="packages.html">الباقات</a>
+    <a href="payments.html">الدفع</a>
+    <a href="receipts.html">الإيصالات</a>
+    <a href="search.html">بحث المشتركين</a>
+    <a href="report.html">التقارير</a>
 </section>
 </main>
 
@@ -108,14 +82,20 @@ let subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
 let receipts = JSON.parse(localStorage.getItem("receipts")) || [];
 let packages = JSON.parse(localStorage.getItem("packages")) || [];
 
-// تحديث الأرقام في لوحة التحكم
+// تحديث الأرقام على لوحة التحكم
 document.getElementById("totalSubscribers").textContent = subscribers.length;
 document.getElementById("totalReceipts").textContent = receipts.length;
-document.getElementById("totalPackages").textContent = packages.length;
 
 // حساب إجمالي الإيرادات
-let totalRevenue = receipts.reduce((sum,r)=> sum + parseFloat(r.price),0);
-document.getElementById("totalRevenue").textContent = totalRevenue.toFixed(2);
+let totalRevenue = 0;
+subscribers.forEach(sub=>{
+    totalRevenue += parseFloat(sub.paid || 0);
+});
+document.getElementById("totalRevenue").textContent = `$${totalRevenue.toFixed(2)}`;
+
+// عدد الباقات
+document.getElementById("totalPackages").textContent = packages.length;
 </script>
+
 </body>
 </html>
