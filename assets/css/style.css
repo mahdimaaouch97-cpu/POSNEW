@@ -1,42 +1,162 @@
+/* --- إعدادات عامة --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    direction: rtl;
-    background: #f7f7f7;
-    padding: 20px;
-}
-
-h2 {
+    background-color: #f7f7f7;
     color: #333;
+    line-height: 1.6;
 }
 
-input, button, select {
-    padding: 8px;
-    margin: 5px 0;
+a {
+    text-decoration: none;
+    color: #007bff;
 }
 
-button {
-    cursor: pointer;
+a:hover {
+    text-decoration: underline;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-table, th, td {
-    border: 1px solid #ccc;
-}
-
-th, td {
-    padding: 8px;
+/* --- الهيدر والقائمة --- */
+header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 20px 10px;
     text-align: center;
 }
 
-.login-container {
-    max-width: 300px;
-    margin: 50px auto;
-    background: #fff;
+header h1 {
+    margin-bottom: 10px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+nav ul li {
+    display: inline-block;
+}
+
+nav ul li a {
+    color: #fff;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- المحتوى الرئيسي --- */
+main {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 10px;
+}
+
+.dashboard h2 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.dashboard p {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* --- البطاقات --- */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 0 10px #ccc;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.card h3 {
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+.card p {
+    margin-bottom: 15px;
+}
+
+.card a {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.card a:hover {
+    background-color: #0056b3;
+}
+
+/* --- الجداول --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table th, table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+table th {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* --- الأزرار --- */
+button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* --- الفوتر --- */
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 15px 10px;
+    margin-top: 40px;
 }
