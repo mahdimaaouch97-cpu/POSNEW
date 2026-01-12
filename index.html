@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>POS Dashboard</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body onload="checkLogin()">
+
+    <h1>لوحة التحكم - برنامج الجباية</h1>
+
+    <nav>
+        <ul>
+            <li><a href="subscribers.html">المشتركين</a></li>
+            <li><a href="payments.html">الدفع والإيصالات</a></li>
+            <li><a href="receipts.html">أرشيف الإيصالات</a></li>
+            <li><a href="report.html">التقارير الشهرية</a></li>
+            <li><a href="#" onclick="logout()">تسجيل الخروج</a></li>
+        </ul>
+    </nav>
+
+    <p>مرحبًا <span id="usernameDisplay"></span></p>
+
+    <script src="assets/js/core.js"></script>
+    <script>
+        // عرض اسم المستخدم الحالي
+        const usernameDisplay = document.getElementById("usernameDisplay");
+        usernameDisplay.textContent = localStorage.getItem("loggedInUser") || "ضيف";
+
+        // دالة تسجيل الخروج
+        function logout() {
+            if(confirm("هل تريد تسجيل الخروج؟")) {
+                localStorage.removeItem("loggedInUser");
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+
+</body>
+</html>
