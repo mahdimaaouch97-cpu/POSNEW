@@ -5,28 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة التحكم - FAST NET</title>
 <link rel="stylesheet" href="assets/css/style.css">
-<style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5; }
-header { background:#007bff; color:#fff; padding:20px; text-align:center; }
-header h1 { margin:0; }
-nav ul { display:flex; justify-content:center; list-style:none; padding:0; margin:10px 0 0; gap:10px; flex-wrap:wrap; }
-nav ul li a { color:#fff; text-decoration:none; padding:10px 15px; background:#0056b3; border-radius:5px; transition:0.3s; }
-nav ul li a:hover, nav ul li a.active { background:#003f7f; }
-
-.dashboard { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; padding:20px; }
-.card { background:#fff; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1); text-align:center; }
-.card h2 { margin:0 0 10px; font-size:2rem; color:#007bff; }
-.card p { margin:0; font-weight:bold; }
-
-.quick-links { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:20px; }
-.quick-links a { flex:1 1 150px; padding:15px; background:#28a745; color:#fff; text-decoration:none; text-align:center; border-radius:8px; transition:0.3s; }
-.quick-links a:hover { background:#1e7e34; }
-
-footer { text-align:center; padding:15px; background:#007bff; color:#fff; margin-top:20px; }
-</style>
 </head>
 <body>
-
 <header>
 <h1>لوحة التحكم - FAST NET</h1>
 <nav>
@@ -44,31 +24,31 @@ footer { text-align:center; padding:15px; background:#007bff; color:#fff; margin
 
 <main>
 <section class="dashboard">
-    <div class="card">
-        <h2 id="totalSubscribers">0</h2>
-        <p>عدد المشتركين</p>
-    </div>
-    <div class="card">
-        <h2 id="totalReceipts">0</h2>
-        <p>عدد الإيصالات</p>
-    </div>
-    <div class="card">
-        <h2 id="totalRevenue">$0.00</h2>
-        <p>إجمالي الإيرادات بالدولار</p>
-    </div>
-    <div class="card">
-        <h2 id="totalPackages">0</h2>
-        <p>عدد الباقات</p>
-    </div>
+<div class="card">
+<h2 id="totalSubscribers">0</h2>
+<p>عدد المشتركين</p>
+</div>
+<div class="card">
+<h2 id="totalReceipts">0</h2>
+<p>عدد الإيصالات</p>
+</div>
+<div class="card">
+<h2 id="totalRevenue">$0.00</h2>
+<p>إجمالي الإيرادات بالدولار</p>
+</div>
+<div class="card">
+<h2 id="totalPackages">0</h2>
+<p>عدد الباقات</p>
+</div>
 </section>
 
 <section class="quick-links">
-    <a href="subscribers.html">المشتركين</a>
-    <a href="packages.html">الباقات</a>
-    <a href="payments.html">الدفع</a>
-    <a href="receipts.html">الإيصالات</a>
-    <a href="search.html">بحث المشتركين</a>
-    <a href="report.html">التقارير</a>
+<a href="subscribers.html">المشتركين</a>
+<a href="packages.html">الباقات</a>
+<a href="payments.html">الدفع</a>
+<a href="receipts.html">الإيصالات</a>
+<a href="search.html">بحث المشتركين</a>
+<a href="report.html">التقارير</a>
 </section>
 </main>
 
@@ -89,13 +69,12 @@ document.getElementById("totalReceipts").textContent = receipts.length;
 // حساب إجمالي الإيرادات
 let totalRevenue = 0;
 subscribers.forEach(sub=>{
-    totalRevenue += parseFloat(sub.paid || 0);
+totalRevenue += parseFloat(sub.paid || 0);
 });
 document.getElementById("totalRevenue").textContent = `$${totalRevenue.toFixed(2)}`;
 
 // عدد الباقات
 document.getElementById("totalPackages").textContent = packages.length;
 </script>
-
 </body>
 </html>
