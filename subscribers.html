@@ -4,58 +4,24 @@
   <meta charset="UTF-8">
   <title>المشتركين</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f9f9f9;
-    }
-    h1 {
-      text-align: center;
-      color: #007BFF;
-    }
-    #controls {
-      margin-bottom: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-    #subscribersTable {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    #subscribersTable th, #subscribersTable td {
-      border: 1px solid #ccc;
-      padding: 8px 12px;
-      text-align: center;
-    }
-    #subscribersTable th {
-      background-color: #007BFF;
-      color: white;
-      cursor: pointer;
-    }
-    #subscribersTable tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-    button {
-      padding: 5px 10px;
-      margin: 2px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      color: white;
-    }
+    body { font-family: Arial; margin: 20px; background: #f9f9f9; }
+    h1 { text-align: center; color: #007BFF; }
+    #controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; align-items: center; }
+    #subscribersTable { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    #subscribersTable th, #subscribersTable td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+    #subscribersTable th { background-color: #007BFF; color: white; cursor: pointer; }
+    #subscribersTable tr:nth-child(even) { background-color: #f2f2f2; }
+    button { padding: 5px 10px; margin: 2px; border-radius: 4px; border: none; cursor: pointer; color: white; }
     .edit-btn { background-color: #28a745; }
     .delete-btn { background-color: #dc3545; }
     .delete-all-btn { background-color: #6c757d; }
     .export-btn { background-color: #17a2b8; }
     .import-btn { background-color: #ffc107; color: black; }
     .add-btn { background-color: #007BFF; }
+    .print-btn { background-color: #6f42c1; }
     input[type="file"] { display: none; }
-    #searchInput, #addName, #addPhone, #addPlan, #addDate,
-    .edit-input { padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; }
-    #addForm, .editForm { display: none; gap: 5px; justify-content: center; margin-bottom: 10px; }
+    #searchInput, #addName, #addPhone, #addPlan, #addDate, .edit-input { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+    #addForm { display: none; gap: 5px; justify-content: center; margin-bottom: 10px; }
     .save-btn { background-color: #28a745; }
     .cancel-btn { background-color: #6c757d; }
   </style>
@@ -73,9 +39,9 @@
   </label>
   <input type="text" id="searchInput" placeholder="بحث بالاسم أو الباقة..." onkeyup="filterTable()">
   <button class="add-btn" onclick="toggleAddForm()">إضافة مشترك</button>
+  <button class="print-btn" onclick="printTable()">طباعة الجدول</button>
 </div>
 
-<!-- نموذج إضافة مشترك -->
 <div id="addForm">
   <input type="text" id="addName" placeholder="الاسم">
   <input type="text" id="addPhone" placeholder="الهاتف">
@@ -88,11 +54,11 @@
 <table id="subscribersTable">
   <thead>
     <tr>
-      <th>رقم</th>
-      <th>الاسم</th>
-      <th>الهاتف</th>
-      <th>الباقة</th>
-      <th>تاريخ الاشتراك</th>
+      <th onclick="sortTable(0)">رقم</th>
+      <th onclick="sortTable(1)">الاسم</th>
+      <th onclick="sortTable(2)">الهاتف</th>
+      <th onclick="sortTable(3)">الباقة</th>
+      <th onclick="sortTable(4)">تاريخ الاشتراك</th>
       <th>الإجراءات</th>
     </tr>
   </thead>
@@ -124,6 +90,7 @@ function renderTable() {
       <td>
         <button class="edit-btn" onclick="showEditForm(${sub.id}, this)">تعديل</button>
         <button class="delete-btn" onclick="deleteSubscriber(${sub.id})">حذف</button>
+        <button class="print-btn" onclick="printSubscriber(${sub.id})">طباعة</button>
       </td>
     `;
     tbody.appendChild(row);
@@ -131,11 +98,7 @@ function renderTable() {
 }
 
 function toggleAddForm() {
-  if(addForm.style.display === "none" || addForm.style.display === "") {
-    addForm.style.display = "flex";
-  } else {
-    addForm.style.display = "none";
-  }
+  addForm.style.display = (addForm.style.display === "flex" ? "none" : "flex");
   clearAddForm();
 }
 
@@ -173,7 +136,6 @@ function deleteAll() {
   }
 }
 
-// تعديل مشترك داخل الجدول
 function showEditForm(id, btn) {
   const row = btn.parentElement.parentElement;
   const sub = subscribers.find(s => s.id === id);
@@ -249,6 +211,48 @@ fileInput.addEventListener("change", (e) => {
   };
   reader.readAsArrayBuffer(file);
 });
+
+// فرز الجدول عند الضغط على الرأس
+function sortTable(n) {
+  let rows = Array.from(tbody.rows);
+  let asc = tbody.getAttribute("data-sort") !== n + "-asc";
+  rows.sort((a,b)=>{
+    let x = a.cells[n].textContent.toLowerCase();
+    let y = b.cells[n].textContent.toLowerCase();
+    if(!isNaN(x) && !isNaN(y)) return asc ? x-y : y-x;
+    return asc ? x.localeCompare(y) : y.localeCompare(x);
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+  tbody.setAttribute("data-sort", n + (asc ? "-asc" : "-desc"));
+}
+
+// طباعة الجدول كامل
+function printTable() {
+  const printWindow = window.open('', '', 'height=600,width=800');
+  printWindow.document.write('<html><head><title>طباعة المشتركين</title></head><body>');
+  printWindow.document.write(document.getElementById("subscribersTable").outerHTML);
+  printWindow.document.write('</body></html>');
+  printWindow.document.close();
+  printWindow.print();
+}
+
+// طباعة مشترك محدد
+function printSubscriber(id) {
+  const sub = subscribers.find(s=>s.id===id);
+  const printWindow = window.open('', '', 'height=400,width=600');
+  printWindow.document.write('<html><head><title>إيصال مشترك</title></head><body>');
+  printWindow.document.write(`<h2>إيصال مشترك</h2>
+    <table border="1" style="border-collapse: collapse; width: 100%; text-align: center;">
+      <tr><th>رقم</th><td>${sub.id}</td></tr>
+      <tr><th>الاسم</th><td>${sub.name}</td></tr>
+      <tr><th>الهاتف</th><td>${sub.phone}</td></tr>
+      <tr><th>الباقة</th><td>${sub.plan}</td></tr>
+      <tr><th>تاريخ الاشتراك</th><td>${sub.date}</td></tr>
+    </table>`);
+  printWindow.document.write('</body></html>');
+  printWindow.document.close();
+  printWindow.print();
+}
 
 renderTable();
 </script>
