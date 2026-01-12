@@ -1,46 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<title>المشتركين - FAST NET</title>
-<link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-<h2>المشتركين</h2>
-<button onclick="goHome()">🏠 العودة للصفحة الرئيسية</button>
-<button onclick="exportSubscribers()">📦 تصدير Excel</button>
-<button onclick="importSubscribers()">📤 استيراد Excel</button>
-<button onclick="deleteAllSubscribers()">🗑️ حذف جميع المشتركين</button>
-
-<table id="subscribersTable">
-<tr>
-<th>الاسم</th><th>الهاتف</th><th>العنوان</th><th>رسم الاشتراك</th><th>الحالة</th><th>حذف</th>
-</tr>
-</table>
-
-<h3>إضافة مشترك جديد</h3>
-<form id="addSubscriberForm">
-<input type="text" placeholder="الاسم" id="name" required>
-<input type="text" placeholder="الهاتف" id="phone" required>
-<input type="text" placeholder="العنوان" id="address">
-<input type="number" placeholder="رسم الاشتراك $" id="fee" required>
-<button type="submit">إضافة</button>
-</form>
-
-<script src="assets/js/core.js"></script>
-<script src="assets/js/subscribers.js"></script>
-<script>
-window.onload = updateSubscribersTable;
-document.getElementById("addSubscriberForm").onsubmit = function(e){
-    e.preventDefault();
-    addSubscriber(
-        document.getElementById("name").value,
-        document.getElementById("phone").value,
-        document.getElementById("address").value,
-        document.getElementById("fee").value
-    );
-    this.reset();
-};
-</script>
-</body>
-</html>
