@@ -1,5 +1,4 @@
 // ملف الدوال المشتركة POSNEW - main.js
-// يمكن وضع أي دوال مشتركة هنا لتسهيل استخدام المشروع
 
 // تحديث قائمة الباقات في أي صفحة
 function fillPackageDropdown(selectElementId){
@@ -34,7 +33,7 @@ function printReceipt(subscriber){
         <h2>إيصال الدفع</h2>
         <table>
         <tr><th>الاسم:</th><td>${subscriber.name}</td></tr>
-        <tr><th>العنوان:</th><td>${subscriber.address}</td></tr>
+        <tr><th>العنوان:</th><td>${subscriber.address || ""}</td></tr>
         <tr><th>الباقة:</th><td>${subscriber.package}</td></tr>
         <tr><th>المبلغ المدفوع ($):</th><td>$${subscriber.paid.toFixed(2)}</td></tr>
         <tr><th>المبلغ المتبقي ($):</th><td>$${remaining}</td></tr>
@@ -47,7 +46,7 @@ function printReceipt(subscriber){
     printWindow.print();
 }
 
-// دالة لتحديث لوحة التحكم
+// تحديث لوحة التحكم
 function updateDashboard(){
     const subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
     const receipts = JSON.parse(localStorage.getItem("receipts")) || [];
