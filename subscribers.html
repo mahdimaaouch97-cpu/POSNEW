@@ -1,41 +1,134 @@
-// assets/js/subscribers.js
-const subscribersTable = document.getElementById("subscribersTable");
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>المشتركين</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
 
-function loadSubscribers() {
-  const data = getData(STORAGE_KEYS.subscribers);
-  subscribersTable.innerHTML = "";
-  data.forEach((s, i) => {
-    subscribersTable.innerHTML += `
+    h1 {
+      text-align: center;
+      color: #007BFF;
+    }
+
+    #subscribersTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    #subscribersTable th, #subscribersTable td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      text-align: center;
+    }
+
+    #subscribersTable th {
+      background-color: #007BFF;
+      color: white;
+    }
+
+    #subscribersTable tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .edit-btn { background-color: #28a745; }
+    .delete-btn { background-color: #dc3545; }
+    .delete-all-btn { background-color: #6c757d; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>قائمة المشتركين</h1>
+  <button class="delete-all-btn" onclick="deleteAll()">حذف جميع المشتركين</button>
+
+  <table id="subscribersTable">
+    <thead>
       <tr>
-        <td>${i + 1}</td>
-        <td>${s.name}</td>
-        <td>${s.phone}</td>
-        <td>${s.plan || "-"}</td>
-        <td>${s.price || "-"}</td>
-        <td><button onclick="deleteSubscriber(${i})">❌</button></td>
+        <th>رقم</th>
+        <th>الاسم</th>
+        <th>الهاتف</th>
+        <th>الباقة</th>
+        <th>تاريخ الاشتراك</th>
+        <th>الإجراءات</th>
       </tr>
-    `;
-  });
-}
+    </thead>
+    <tbody>
+      <!-- سيتم ملؤه ديناميكيًا -->
+    </tbody>
+  </table>
 
-function addSubscriber() {
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const plan = document.getElementById("plan").value;
-  const price = document.getElementById("price").value;
+  <script>
+    // بيانات تجريبية للمشتركين
+    let subscribers = [
+      { id: 1, name: "محمد علي", phone: "71346411", plan: "باقة أساسية", date: "2026-01-01" },
+      { id: 2, name: "أحمد حسن", phone: "71338640", plan: "باقة متقدمة", date: "2026-01-05" },
+      { id: 3, name: "ليلى سمير", phone: "71340000", plan: "باقة VIP", date: "2026-01-08" }
+    ];
 
-  const data = getData(STORAGE_KEYS.subscribers);
-  data.push({ name, phone, plan, price });
-  saveData(STORAGE_KEYS.subscribers, data);
+    const tbody = document.querySelector("#subscribersTable tbody");
 
-  document.querySelector("form").reset();
-  loadSubscribers();
-}
+    // دالة لعرض المشتركين في الجدول
+    function renderTable() {
+      tbody.innerHTML = ""; // مسح الجدول قبل إعادة العرض
+      subscribers.forEach(sub => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${sub.id}</td>
+          <td>${sub.name}</td>
+          <td>${sub.phone}</td>
+          <td>${sub.plan}</td>
+          <td>${sub.date}</td>
+          <td>
+            <button class="edit-btn" onclick="editSubscriber(${sub.id})">تعديل</button>
+            <button class="delete-btn" onclick="deleteSubscriber(${sub.id})">حذف</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
 
-function deleteSubscriber(index) {
-  if (!confirm("هل تريد حذف المشترك؟")) return;
-  const data = getData(STORAGE_KEYS.subscribers);
-  data.splice(index, 1);
-  saveData(STORAGE_KEYS.subscribers, data);
-  loadSubscribers();
-}
+    // دالة حذف مشترك واحد
+    function deleteSubscriber(id) {
+      if(confirm("هل تريد حذف هذا المشترك؟")) {
+        subscribers = subscribers.filter(sub => sub.id !== id);
+        renderTable();
+      }
+    }
+
+    // دالة حذف جميع المشتركين
+    function deleteAll() {
+      if(confirm("هل تريد حذف جميع المشتركين؟")) {
+        subscribers = [];
+        renderTable();
+      }
+    }
+
+    // دالة تعديل مشترك (مثال بسيط)
+    function editSubscriber(id) {
+      const sub = subscribers.find(s => s.id === id);
+      const newName = prompt("تعديل الاسم:", sub.name);
+      if(newName) {
+        sub.name = newName;
+        renderTable();
+      }
+    }
+
+    // عرض الجدول عند تحميل الصفحة
+    renderTable();
+  </script>
+</body>
+</html>
