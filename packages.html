@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة الباقات</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>إدارة الباقات</h1>
+        <nav>
+            <a href="index.html">الرئيسية</a> |
+            <a href="subscribers.html">المشتركين</a> |
+            <a href="payments.html">الدفع</a> |
+            <a href="packages.html">الباقات</a>
+        </nav>
+    </header>
+
+    <main>
+        <button onclick="addPackage()">إضافة باقة جديدة</button>
+        <table id="packagesTable" border="1">
+            <thead>
+                <tr>
+                    <th>الرقم</th>
+                    <th>اسم الباقة</th>
+                    <th>السعر</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- سيتم إضافة الباقات هنا -->
+            </tbody>
+        </table>
+    </main>
+
+    <script src="assets/js/packages.js"></script>
+</body>
+</html>
