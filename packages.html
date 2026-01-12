@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- الهيدر والقائمة -->
     <header>
         <h1>إدارة الباقات</h1>
         <nav>
@@ -23,7 +22,6 @@
         </nav>
     </header>
 
-    <!-- المحتوى الرئيسي -->
     <main>
         <section class="packages-section">
             <button onclick="addPackage()">إضافة باقة جديدة</button>
@@ -37,30 +35,25 @@
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- الباقات ستظهر هنا -->
-                </tbody>
+                <tbody></tbody>
             </table>
         </section>
     </main>
 
-    <!-- الفوتر -->
     <footer>
         <p>© 2026 FAST NET. جميع الحقوق محفوظة.</p>
     </footer>
 
-    <!-- سكريبت إدارة الباقات -->
     <script>
-        // مصفوفة لتخزين الباقات مؤقتاً
-        let packages = [];
+        // --- تحميل الباقات من LocalStorage ---
+        let packages = JSON.parse(localStorage.getItem("packages")) || [];
 
-        // دالة عرض الباقات في الجدول
+        // --- عرض الباقات في الجدول ---
         function renderPackages() {
             const tableBody = document.querySelector("#packagesTable tbody");
             tableBody.innerHTML = "";
             packages.forEach((pkg, index) => {
                 const row = document.createElement("tr");
-
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${pkg.name}</td>
@@ -72,9 +65,12 @@
                 `;
                 tableBody.appendChild(row);
             });
+
+            // حفظ تلقائي في LocalStorage بعد أي تعديل
+            localStorage.setItem("packages", JSON.stringify(packages));
         }
 
-        // إضافة باقة جديدة
+        // --- إضافة باقة جديدة ---
         function addPackage() {
             const name = prompt("أدخل اسم الباقة:");
             if (!name) return;
@@ -84,7 +80,7 @@
             renderPackages();
         }
 
-        // تعديل باقة
+        // --- تعديل باقة ---
         function editPackage(index) {
             const pkg = packages[index];
             const newName = prompt("تعديل اسم الباقة:", pkg.name);
@@ -95,7 +91,7 @@
             renderPackages();
         }
 
-        // حذف باقة
+        // --- حذف باقة ---
         function deletePackage(index) {
             if (confirm("هل تريد حذف هذه الباقة؟")) {
                 packages.splice(index, 1);
@@ -103,7 +99,7 @@
             }
         }
 
-        // عرض الباقات عند تحميل الصفحة
+        // --- عرض الباقات عند تحميل الصفحة ---
         window.onload = renderPackages;
     </script>
 </body>
