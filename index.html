@@ -1,52 +1,24 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-<meta charset="UTF-8">
-<title>FAST NET - لوحة التحكم</title>
-<link rel="stylesheet" href="assets/css/style.css">
+  <meta charset="UTF-8">
+  <title>تسجيل الدخول</title>
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+  <div class="login-container">
+    <h2>تسجيل الدخول</h2>
+    <form id="loginForm">
+      <label>اسم المستخدم</label>
+      <input type="text" id="username" required>
+      <label>كلمة المرور</label>
+      <input type="password" id="password" required>
+      <button type="submit">تسجيل الدخول</button>
+    </form>
+    <p id="errorMsg" style="color:red;"></p>
+  </div>
 
-<h1>لوحة التحكم FAST NET</h1>
-
-<div class="stats">
-    <div>عدد المشتركين: <span id="totalSubs">0</span></div>
-    <div>عدد المدفوع: <span id="totalPaid">0</span></div>
-    <div>عدد غير المدفوع: <span id="totalUnpaid">0</span></div>
-    <div>المبلغ المدفوع: <span id="totalAmount">0</span></div>
-</div>
-
-<nav>
-    <button onclick="location.href='subscribers.html'">المشتركين</button>
-    <button onclick="location.href='payments.html'">الدفع</button>
-    <button onclick="location.href='report.html'">التقارير</button>
-    <button onclick="location.href='receipts.html'">أرشيف الإيصالات</button>
-</nav>
-
-<script>
-// حماية الصفحة (Login check)
-if (!localStorage.getItem("loggedIn")) {
-    window.location.href = "login.html";
-}
-
-// تحديث الإحصائيات
-function updateDashboardStats() {
-    const subs = JSON.parse(localStorage.getItem("subscribers")) || [];
-    const payments = JSON.parse(localStorage.getItem("payments")) || [];
-
-    document.getElementById("totalSubs").innerText = subs.length;
-
-    let paidCount = payments.length;
-    let unpaidCount = subs.length - paidCount;
-    let totalAmount = payments.reduce((sum, p) => sum + Number(p.amount), 0);
-
-    document.getElementById("totalPaid").innerText = paidCount;
-    document.getElementById("totalUnpaid").innerText = unpaidCount;
-    document.getElementById("totalAmount").innerText = totalAmount + " $";
-}
-
-window.onload = updateDashboardStats;
-</script>
-
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/login.js"></script>
 </body>
 </html>
