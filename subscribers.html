@@ -3,22 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>إدارة المشتركين - FAST NET</title>
+<title>المشتركين - FAST NET</title>
 <link rel="stylesheet" href="assets/css/style.css">
-<style>
-body{font-family:Arial; background:#f5f5f5; margin:0; padding:0;}
-header{background:#007bff; color:#fff; padding:20px; text-align:center;}
-nav ul{display:flex; justify-content:center; list-style:none; padding:0; margin:10px 0 0; gap:10px; flex-wrap:wrap;}
-nav ul li a{color:#fff; text-decoration:none; padding:10px 15px; background:#0056b3; border-radius:5px;}
-nav ul li a:hover, nav ul li a.active{background:#003f7f;}
-main{padding:20px;}
-form input, form select, form button{padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc;}
-form button{border:none; background:#28a745; color:#fff; cursor:pointer; transition:0.3s;}
-form button:hover{background:#218838;}
-#deleteAllBtn{background:red; margin-bottom:10px;}
-table{width:100%; border-collapse:collapse; margin-top:10px; background:#fff;}
-th,td{border:1px solid #000; padding:8px; text-align:center;}
-</style>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -38,20 +25,13 @@ th,td{border:1px solid #000; padding:8px; text-align:center;}
 </header>
 
 <main>
-<h2>إضافة مشترك جديد</h2>
-<form id="addSubscriberForm">
-<input type="text" id="subName" placeholder="الاسم" required>
-<input type="text" id="subAddress" placeholder="العنوان" required>
-<select id="subPackage" required></select>
-<input type="number" id="subPaid" placeholder="المبلغ المدفوع ($)" min="0" value="0">
-<button type="submit">إضافة</button>
-</form>
+<h2>المشتركين</h2>
 
-<h3>أدوات سريعة</h3>
-<input type="text" id="searchSubscriberInput" placeholder="أدخل اسم المشترك للبحث">
-<button id="searchSubscriberBtn">بحث</button>
-<button id="resetSearchBtn">عرض الكل</button>
-<button id="deleteAllBtn">حذف جميع المشتركين</button>
+<div style="margin-bottom:15px;">
+<input type="file" id="importExcel" accept=".xlsx, .xls">
+<button id="exportExcelBtn">تصدير إلى Excel</button>
+<button onclick="deleteAllSubscribers()">حذف جميع المشتركين</button>
+</div>
 
 <table id="subscribersTable">
 <thead>
@@ -60,9 +40,10 @@ th,td{border:1px solid #000; padding:8px; text-align:center;}
 <th>الاسم</th>
 <th>العنوان</th>
 <th>الباقة</th>
-<th>سعر الاشتراك ($)</th>
+<th>سعر الباقة ($)</th>
 <th>المبلغ المدفوع ($)</th>
 <th>المبلغ المتبقي ($)</th>
+<th>حالة الدفع</th>
 <th>الإجراءات</th>
 </tr>
 </thead>
@@ -74,164 +55,53 @@ th,td{border:1px solid #000; padding:8px; text-align:center;}
 <p>© 2026 FAST NET. جميع الحقوق محفوظة.</p>
 </footer>
 
+<script src="assets/js/core.js"></script>
+<script src="assets/js/subscribers.js"></script>
+
 <script>
-// البيانات
-let subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
-let packages = JSON.parse(localStorage.getItem("packages")) || [];
+// التصدير إلى Excel
+document.getElementById("exportExcelBtn").addEventListener("click", function(){
+    const ws_data = subscribers.map(sub => ({
+        "الاسم": sub.name,
+        "العنوان": sub.address || "",
+        "الباقة": sub.package,
+        "سعر الباقة ($)": sub.price || 0,
+        "المبلغ المدفوع ($)": sub.paid.toFixed(2),
+        "المبلغ المتبقي ($)": getRemaining(sub)
+    }));
 
-// تعبئة قائمة الباقات
-const subPackage = document.getElementById("subPackage");
-packages.forEach(p => {
-    const option = document.createElement("option");
-    option.value = p.name;
-    option.textContent = p.name;
-    subPackage.appendChild(option);
+    const ws = XLSX.utils.json_to_sheet(ws_data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "المشتركين");
+    XLSX.writeFile(wb, "subscribers.xlsx");
 });
 
-// إضافة مشترك
-document.getElementById("addSubscriberForm").addEventListener("submit", function(e){
-    e.preventDefault();
-    const name = document.getElementById("subName").value.trim();
-    const address = document.getElementById("subAddress").value.trim();
-    const pkg = document.getElementById("subPackage").value;
-    const paid = parseFloat(document.getElementById("subPaid").value) || 0;
+// الإستيراد من Excel
+document.getElementById("importExcel").addEventListener("change", function(e){
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(event){
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, {type:'array'});
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-    if(!name || !address || !pkg) return alert("يرجى ملء جميع الحقول");
-
-    subscribers.push({name,address,package:pkg,paid});
-    localStorage.setItem("subscribers", JSON.stringify(subscribers));
-    renderSubscribers();
-    this.reset();
-});
-
-// دالة رسم الجدول
-function renderSubscribers(data = subscribers){
-    const tbody = document.querySelector("#subscribersTable tbody");
-    tbody.innerHTML = "";
-    data.forEach((sub,index)=>{
-        const pkgPrice = packages.find(p=>p.name===sub.package)?.price || 0;
-        const remaining = (pkgPrice - sub.paid).toFixed(2);
-        const row = document.createElement("tr");
-        row.innerHTML = `
-        <td>${index+1}</td>
-        <td>${sub.name}</td>
-        <td>${sub.address}</td>
-        <td>${sub.package}</td>
-        <td>$${pkgPrice}</td>
-        <td>$${sub.paid.toFixed(2)}</td>
-        <td>$${remaining}</td>
-        <td>
-            <button onclick="editSubscriber(${index})">تعديل</button>
-            <button onclick="deleteSubscriber(${index})">حذف</button>
-            <button onclick="printSubscriber(${index})">طباعة</button>
-        </td>
-        `;
-        tbody.appendChild(row);
-    });
-}
-
-// حذف مشترك
-function deleteSubscriber(index){
-    if(confirm("هل أنت متأكد من حذف المشترك؟")){
-        subscribers.splice(index,1);
-        renderSubscribers();
-    }
-}
-
-// تعديل مشترك
-function editSubscriber(index){
-    const sub = subscribers[index];
-    const editDiv = document.createElement("div");
-    editDiv.style.position = "fixed";
-    editDiv.style.top = "50%";
-    editDiv.style.left = "50%";
-    editDiv.style.transform = "translate(-50%, -50%)";
-    editDiv.style.background="#fff";
-    editDiv.style.padding="20px";
-    editDiv.style.borderRadius="10px";
-    editDiv.style.boxShadow="0 3px 15px rgba(0,0,0,0.3)";
-    editDiv.style.zIndex=1000;
-    editDiv.innerHTML=`
-        <h3>تعديل بيانات المشترك</h3>
-        <label>الاسم:</label><br><input type="text" id="editName" value="${sub.name}"><br><br>
-        <label>العنوان:</label><br><input type="text" id="editAddress" value="${sub.address}"><br><br>
-        <label>الباقة:</label><br>
-        <select id="editPackage">${packages.map(p=>`<option value="${p.name}" ${p.name===sub.package?'selected':''}>${p.name}</option>`).join('')}</select><br><br>
-        <label>المبلغ المدفوع ($):</label><br><input type="number" id="editPaid" value="${sub.paid}" min="0"><br><br>
-        <button id="saveEdit">حفظ</button>
-        <button id="cancelEdit">إلغاء</button>
-    `;
-    document.body.appendChild(editDiv);
-
-    document.getElementById("saveEdit").onclick = function(){
-        const newName = document.getElementById("editName").value.trim();
-        const newAddress = document.getElementById("editAddress").value.trim();
-        const newPkg = document.getElementById("editPackage").value;
-        const newPaid = parseFloat(document.getElementById("editPaid").value);
-        if(!newName || !newAddress || !newPkg || isNaN(newPaid)) return alert("املأ كل الحقول بشكل صحيح!");
-        subscribers[index] = {name:newName,address:newAddress,package:newPkg,paid:newPaid};
-        renderSubscribers();
-        document.body.removeChild(editDiv);
-    }
-
-    document.getElementById("cancelEdit").onclick = function(){
-        document.body.removeChild(editDiv);
-    }
-}
-
-// طباعة مشترك
-function printSubscriber(index){
-    const sub = subscribers[index];
-    const pkgPrice = packages.find(p=>p.name===sub.package)?.price || 0;
-    const remaining = (pkgPrice - sub.paid).toFixed(2);
-    const printWindow = window.open('','', 'width=400,height=600');
-    printWindow.document.write(`
-        <html><head><title>إيصال المشترك</title>
-        <style>body{font-family:Arial;padding:20px;} h2{text-align:center;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #000;padding:8px;text-align:left;}</style>
-        </head>
-        <body>
-        <h2>إيصال المشترك</h2>
-        <table>
-        <tr><th>الاسم:</th><td>${sub.name}</td></tr>
-        <tr><th>العنوان:</th><td>${sub.address}</td></tr>
-        <tr><th>الباقة:</th><td>${sub.package}</td></tr>
-        <tr><th>سعر الاشتراك ($):</th><td>$${pkgPrice}</td></tr>
-        <tr><th>المبلغ المدفوع ($):</th><td>$${sub.paid.toFixed(2)}</td></tr>
-        <tr><th>المبلغ المتبقي ($):</th><td>$${remaining}</td></tr>
-        <tr><th>التاريخ:</th><td>${new Date().toLocaleDateString()}</td></tr>
-        </table>
-        <p style="text-align:center;margin-top:20px;">شكراً لاستخدامكم FAST NET</p>
-        </body></html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-}
-
-// حذف جميع المشتركين
-document.getElementById("deleteAllBtn").addEventListener("click", function(){
-    if(confirm("هل أنت متأكد من حذف جميع المشتركين؟")){
-        subscribers = [];
+        jsonData.forEach(row=>{
+            subscribers.push({
+                name: row["الاسم"] || "",
+                address: row["العنوان"] || "",
+                package: row["الباقة"] || "",
+                price: parseFloat(row["سعر الباقة ($)"]) || 0,
+                paid: parseFloat(row["المبلغ المدفوع ($)"]) || 0
+            });
+        });
         localStorage.setItem("subscribers", JSON.stringify(subscribers));
         renderSubscribers();
-    }
+        alert("تم الاستيراد بنجاح!");
+    };
+    reader.readAsArrayBuffer(file);
 });
-
-// البحث
-document.getElementById("searchSubscriberBtn").addEventListener("click", function(){
-    const query = document.getElementById("searchSubscriberInput").value.trim().toLowerCase();
-    if(!query) return alert("أدخل اسم المشترك للبحث!");
-    const filtered = subscribers.filter(sub=>sub.name.toLowerCase().includes(query));
-    renderSubscribers(filtered);
-});
-
-// إعادة عرض الكل
-document.getElementById("resetSearchBtn").addEventListener("click", function(){
-    document.getElementById("searchSubscriberInput").value="";
-    renderSubscribers();
-});
-
-// عرض الجدول عند تحميل الصفحة
-renderSubscribers();
 </script>
 
 </body>
