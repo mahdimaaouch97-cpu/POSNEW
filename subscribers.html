@@ -9,33 +9,33 @@
       margin: 20px;
       background-color: #f9f9f9;
     }
-
     h1 {
       text-align: center;
       color: #007BFF;
     }
-
+    #controls {
+      margin-bottom: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
     #subscribersTable {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 10px;
     }
-
     #subscribersTable th, #subscribersTable td {
       border: 1px solid #ccc;
       padding: 8px 12px;
       text-align: center;
     }
-
     #subscribersTable th {
       background-color: #007BFF;
       color: white;
     }
-
     #subscribersTable tr:nth-child(even) {
       background-color: #f2f2f2;
     }
-
     button {
       padding: 5px 10px;
       margin: 2px;
@@ -44,91 +44,146 @@
       cursor: pointer;
       color: white;
     }
-
     .edit-btn { background-color: #28a745; }
     .delete-btn { background-color: #dc3545; }
-    .delete-all-btn { background-color: #6c757d; margin-bottom: 10px; }
+    .delete-all-btn { background-color: #6c757d; }
+    .export-btn { background-color: #17a2b8; }
+    .import-btn { background-color: #ffc107; color: black; }
+    input[type="file"] { display: none; }
+    #searchInput {
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 200px;
+    }
   </style>
 </head>
 <body>
 
-  <h1>قائمة المشتركين</h1>
+<h1>قائمة المشتركين</h1>
+
+<div id="controls">
   <button class="delete-all-btn" onclick="deleteAll()">حذف جميع المشتركين</button>
+  <button class="export-btn" onclick="exportToExcel()">تصدير إلى Excel</button>
+  <label class="import-btn">
+    استيراد من Excel
+    <input type="file" id="fileInput" accept=".xlsx,.xls">
+  </label>
+  <input type="text" id="searchInput" placeholder="بحث بالاسم أو الباقة..." onkeyup="filterTable()">
+</div>
 
-  <table id="subscribersTable">
-    <thead>
-      <tr>
-        <th>رقم</th>
-        <th>الاسم</th>
-        <th>الهاتف</th>
-        <th>الباقة</th>
-        <th>تاريخ الاشتراك</th>
-        <th>الإجراءات</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- سيتم ملؤه ديناميكيًا -->
-    </tbody>
-  </table>
+<table id="subscribersTable">
+  <thead>
+    <tr>
+      <th>رقم</th>
+      <th>الاسم</th>
+      <th>الهاتف</th>
+      <th>الباقة</th>
+      <th>تاريخ الاشتراك</th>
+      <th>الإجراءات</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-  <script>
-    // بيانات تجريبية للمشتركين
-    let subscribers = [
-      { id: 1, name: "محمد علي", phone: "71346411", plan: "باقة أساسية", date: "2026-01-01" },
-      { id: 2, name: "أحمد حسن", phone: "71338640", plan: "باقة متقدمة", date: "2026-01-05" },
-      { id: 3, name: "ليلى سمير", phone: "71340000", plan: "باقة VIP", date: "2026-01-08" }
+<!-- مكتبة XLSX لتصدير واستيراد Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+  let subscribers = [
+    { id: 1, name: "محمد علي", phone: "71346411", plan: "باقة أساسية", date: "2026-01-01" },
+    { id: 2, name: "أحمد حسن", phone: "71338640", plan: "باقة متقدمة", date: "2026-01-05" },
+    { id: 3, name: "ليلى سمير", phone: "71340000", plan: "باقة VIP", date: "2026-01-08" }
+  ];
+
+  const tbody = document.querySelector("#subscribersTable tbody");
+  const fileInput = document.getElementById("fileInput");
+
+  function renderTable() {
+    tbody.innerHTML = "";
+    subscribers.forEach(sub => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${sub.id}</td>
+        <td>${sub.name}</td>
+        <td>${sub.phone}</td>
+        <td>${sub.plan}</td>
+        <td>${sub.date}</td>
+        <td>
+          <button class="edit-btn" onclick="editSubscriber(${sub.id})">تعديل</button>
+          <button class="delete-btn" onclick="deleteSubscriber(${sub.id})">حذف</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function deleteSubscriber(id) {
+    if(confirm("هل تريد حذف هذا المشترك؟")) {
+      subscribers = subscribers.filter(sub => sub.id !== id);
+      renderTable();
+    }
+  }
+
+  function deleteAll() {
+    if(confirm("هل تريد حذف جميع المشتركين؟")) {
+      subscribers = [];
+      renderTable();
+    }
+  }
+
+  function editSubscriber(id) {
+    const sub = subscribers.find(s => s.id === id);
+    const newName = prompt("تعديل الاسم:", sub.name);
+    if(newName) {
+      sub.name = newName;
+      renderTable();
+    }
+  }
+
+  function filterTable() {
+    const filter = document.getElementById("searchInput").value.toLowerCase();
+    Array.from(tbody.rows).forEach(row => {
+      const name = row.cells[1].textContent.toLowerCase();
+      const plan = row.cells[3].textContent.toLowerCase();
+      row.style.display = (name.includes(filter) || plan.includes(filter)) ? "" : "none";
+    });
+  }
+
+  function exportToExcel() {
+    const ws_data = [
+      ["رقم","الاسم","الهاتف","الباقة","تاريخ الاشتراك"],
+      ...subscribers.map(s => [s.id, s.name, s.phone, s.plan, s.date])
     ];
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "المشتركين");
+    XLSX.writeFile(wb, "subscribers.xlsx");
+  }
 
-    const tbody = document.querySelector("#subscribersTable tbody");
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      // تجاهل الصف الأول (رؤوس الأعمدة)
+      subscribers = rows.slice(1).map((r,i) => ({
+        id: r[0] || i+1,
+        name: r[1] || "",
+        phone: r[2] || "",
+        plan: r[3] || "",
+        date: r[4] || ""
+      }));
+      renderTable();
+    };
+    reader.readAsArrayBuffer(file);
+  });
 
-    // دالة لعرض المشتركين في الجدول
-    function renderTable() {
-      tbody.innerHTML = ""; // مسح الجدول قبل إعادة العرض
-      subscribers.forEach(sub => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${sub.id}</td>
-          <td>${sub.name}</td>
-          <td>${sub.phone}</td>
-          <td>${sub.plan}</td>
-          <td>${sub.date}</td>
-          <td>
-            <button class="edit-btn" onclick="editSubscriber(${sub.id})">تعديل</button>
-            <button class="delete-btn" onclick="deleteSubscriber(${sub.id})">حذف</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    // دالة حذف مشترك واحد
-    function deleteSubscriber(id) {
-      if(confirm("هل تريد حذف هذا المشترك؟")) {
-        subscribers = subscribers.filter(sub => sub.id !== id);
-        renderTable();
-      }
-    }
-
-    // دالة حذف جميع المشتركين
-    function deleteAll() {
-      if(confirm("هل تريد حذف جميع المشتركين؟")) {
-        subscribers = [];
-        renderTable();
-      }
-    }
-
-    // دالة تعديل مشترك (مثال بسيط)
-    function editSubscriber(id) {
-      const sub = subscribers.find(s => s.id === id);
-      const newName = prompt("تعديل الاسم:", sub.name);
-      if(newName) {
-        sub.name = newName;
-        renderTable();
-      }
-    }
-
-    // عرض الجدول عند تحميل الصفحة
-    renderTable();
-  </script>
+  renderTable();
+</script>
 </body>
 </html>
