@@ -2,39 +2,67 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>POS Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - برنامج الجباية</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body onload="checkLogin()">
+<body>
+    <!-- الهيدر والقائمة -->
+    <header>
+        <h1>لوحة التحكم - برنامج الجباية</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="subscribers.html">المشتركين</a></li>
+                <li><a href="payments.html">الدفع</a></li>
+                <li><a href="packages.html">الباقات</a></li>
+                <li><a href="receipts.html">الإيصالات</a></li>
+                <li><a href="report.html">التقارير</a></li>
+                <li><a href="login.html">تسجيل الخروج</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <h1>لوحة التحكم - برنامج الجباية</h1>
+    <!-- المحتوى الرئيسي -->
+    <main>
+        <section class="dashboard">
+            <h2>مرحبًا بك في لوحة التحكم</h2>
+            <p>اختر أحد الأقسام من القائمة أعلاه لإدارة المشتركين، المدفوعات، الباقات، الإيصالات، والتقارير.</p>
 
-    <nav>
-        <ul>
-            <li><a href="subscribers.html">المشتركين</a></li>
-            <li><a href="payments.html">الدفع والإيصالات</a></li>
-            <li><a href="receipts.html">أرشيف الإيصالات</a></li>
-            <li><a href="report.html">التقارير الشهرية</a></li>
-            <li><a href="#" onclick="logout()">تسجيل الخروج</a></li>
-        </ul>
-    </nav>
+            <div class="cards">
+                <div class="card">
+                    <h3>المشتركين</h3>
+                    <p>إضافة، تعديل، حذف المشتركين.</p>
+                    <a href="subscribers.html">اذهب</a>
+                </div>
+                <div class="card">
+                    <h3>الدفع والإيصالات</h3>
+                    <p>إصدار إيصالات الدفع وتسجيل المدفوعات.</p>
+                    <a href="payments.html">اذهب</a>
+                </div>
+                <div class="card">
+                    <h3>الباقات</h3>
+                    <p>إضافة وتعديل وحذف الباقات.</p>
+                    <a href="packages.html">اذهب</a>
+                </div>
+                <div class="card">
+                    <h3>الإيصالات</h3>
+                    <p>عرض أرشيف الإيصالات المطبوعة.</p>
+                    <a href="receipts.html">اذهب</a>
+                </div>
+                <div class="card">
+                    <h3>التقارير</h3>
+                    <p>توليد تقارير شهرية PDF.</p>
+                    <a href="report.html">اذهب</a>
+                </div>
+            </div>
+        </section>
+    </main>
 
-    <p>مرحبًا <span id="usernameDisplay"></span></p>
-
-    <script src="assets/js/core.js"></script>
-    <script>
-        // عرض اسم المستخدم الحالي
-        const usernameDisplay = document.getElementById("usernameDisplay");
-        usernameDisplay.textContent = localStorage.getItem("loggedInUser") || "ضيف";
-
-        // دالة تسجيل الخروج
-        function logout() {
-            if(confirm("هل تريد تسجيل الخروج؟")) {
-                localStorage.removeItem("loggedInUser");
-                window.location.href = "login.html";
-            }
-        }
-    </script>
+    <!-- الفوتر -->
+    <footer>
+        <p>© 2026 FAST NET. جميع الحقوق محفوظة.</p>
+    </footer>
 
 </body>
 </html>
