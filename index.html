@@ -1,68 +1,121 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - برنامج الجباية</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم - FAST NET</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+/* تخصيص البطاقات للوحة التحكم */
+.dashboard .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.card h3 {
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+.card p {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+.card a {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.card a:hover {
+    background-color: #0056b3;
+}
+</style>
 </head>
 <body>
-    <!-- الهيدر والقائمة -->
-    <header>
-        <h1>لوحة التحكم - برنامج الجباية</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">الرئيسية</a></li>
-                <li><a href="subscribers.html">المشتركين</a></li>
-                <li><a href="payments.html">الدفع</a></li>
-                <li><a href="packages.html">الباقات</a></li>
-                <li><a href="receipts.html">الإيصالات</a></li>
-                <li><a href="report.html">التقارير</a></li>
-                <li><a href="login.html">تسجيل الخروج</a></li>
-            </ul>
-        </nav>
-    </header>
+<header>
+<h1>لوحة التحكم - FAST NET</h1>
+<nav>
+<ul>
+<li><a href="index.html" class="active">الرئيسية</a></li>
+<li><a href="subscribers.html">المشتركين</a></li>
+<li><a href="payments.html">الدفع</a></li>
+<li><a href="packages.html">الباقات</a></li>
+<li><a href="receipts.html">الإيصالات</a></li>
+<li><a href="report.html">التقارير</a></li>
+<li><a href="login.html">تسجيل الخروج</a></li>
+</ul>
+</nav>
+</header>
 
-    <!-- المحتوى الرئيسي -->
-    <main>
-        <section class="dashboard">
-            <h2>مرحبًا بك في لوحة التحكم</h2>
-            <p>اختر أحد الأقسام من القائمة أعلاه لإدارة المشتركين، المدفوعات، الباقات، الإيصالات، والتقارير.</p>
+<main>
+<section class="dashboard">
+<h2>نظرة عامة على النظام</h2>
 
-            <div class="cards">
-                <div class="card">
-                    <h3>المشتركين</h3>
-                    <p>إضافة، تعديل، حذف المشتركين.</p>
-                    <a href="subscribers.html">اذهب</a>
-                </div>
-                <div class="card">
-                    <h3>الدفع والإيصالات</h3>
-                    <p>إصدار إيصالات الدفع وتسجيل المدفوعات.</p>
-                    <a href="payments.html">اذهب</a>
-                </div>
-                <div class="card">
-                    <h3>الباقات</h3>
-                    <p>إضافة وتعديل وحذف الباقات.</p>
-                    <a href="packages.html">اذهب</a>
-                </div>
-                <div class="card">
-                    <h3>الإيصالات</h3>
-                    <p>عرض أرشيف الإيصالات المطبوعة.</p>
-                    <a href="receipts.html">اذهب</a>
-                </div>
-                <div class="card">
-                    <h3>التقارير</h3>
-                    <p>توليد تقارير شهرية PDF.</p>
-                    <a href="report.html">اذهب</a>
-                </div>
-            </div>
-        </section>
-    </main>
+<div class="cards">
+    <div class="card">
+        <h3>المشتركين</h3>
+        <p id="totalSubscribers">0</p>
+        <a href="subscribers.html">عرض التفاصيل</a>
+    </div>
+    <div class="card">
+        <h3>الإيصالات</h3>
+        <p id="totalReceipts">0</p>
+        <a href="receipts.html">عرض التفاصيل</a>
+    </div>
+    <div class="card">
+        <h3>إجمالي الإيرادات ($)</h3>
+        <p id="totalRevenue">0.00</p>
+        <a href="report.html">عرض التقارير</a>
+    </div>
+    <div class="card">
+        <h3>الباقات</h3>
+        <p id="totalPackages">0</p>
+        <a href="packages.html">عرض التفاصيل</a>
+    </div>
+</div>
+</section>
+</main>
 
-    <!-- الفوتر -->
-    <footer>
-        <p>© 2026 FAST NET. جميع الحقوق محفوظة.</p>
-    </footer>
+<footer>
+<p>© 2026 FAST NET. جميع الحقوق محفوظة.</p>
+</footer>
 
+<script>
+// تحميل البيانات من LocalStorage
+let subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
+let receipts = JSON.parse(localStorage.getItem("receipts")) || [];
+let packages = JSON.parse(localStorage.getItem("packages")) || [];
+
+// تحديث الأرقام في لوحة التحكم
+document.getElementById("totalSubscribers").textContent = subscribers.length;
+document.getElementById("totalReceipts").textContent = receipts.length;
+document.getElementById("totalPackages").textContent = packages.length;
+
+// حساب إجمالي الإيرادات
+let totalRevenue = receipts.reduce((sum,r)=> sum + parseFloat(r.price),0);
+document.getElementById("totalRevenue").textContent = totalRevenue.toFixed(2);
+</script>
 </body>
 </html>
