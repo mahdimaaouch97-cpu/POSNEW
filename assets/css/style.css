@@ -1,162 +1,112 @@
-/* --- إعدادات عامة --- */
-* {
-    box-sizing: border-box;
+/* التنسيقات العامة للمشروع POSNEW */
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
     margin: 0;
     padding: 0;
-    font-family: 'Arial', sans-serif;
 }
 
-body {
-    background-color: #f7f7f7;
-    color: #333;
-    line-height: 1.6;
-}
-
-a {
-    text-decoration: none;
-    color: #007bff;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* --- الهيدر والقائمة --- */
 header {
-    background-color: #007bff;
+    background: #007bff;
     color: #fff;
-    padding: 20px 10px;
+    padding: 20px;
     text-align: center;
 }
 
-header h1 {
-    margin-bottom: 10px;
-}
-
 nav ul {
-    list-style: none;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    gap: 10px;
     flex-wrap: wrap;
-}
-
-nav ul li {
-    display: inline-block;
 }
 
 nav ul li a {
     color: #fff;
-    font-weight: bold;
-    padding: 5px 10px;
+    text-decoration: none;
+    padding: 10px 15px;
+    background: #0056b3;
     border-radius: 5px;
-    transition: background-color 0.3s;
+    transition: 0.3s;
 }
 
-nav ul li a:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+nav ul li a:hover,
+nav ul li a.active {
+    background: #003f7f;
 }
 
-/* --- المحتوى الرئيسي --- */
 main {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 10px;
-}
-
-.dashboard h2 {
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.dashboard p {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-/* --- البطاقات --- */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-}
-
-.card {
-    background-color: #fff;
-    border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-
-.card h3 {
-    margin-bottom: 10px;
-    color: #007bff;
-}
-
-.card p {
-    margin-bottom: 15px;
-}
-
-.card a {
-    display: inline-block;
-    background-color: #007bff;
-    color: #fff;
-    padding: 8px 15px;
+form input,
+form select,
+form button,
+input,
+button {
+    padding: 8px;
+    margin: 5px 0;
     border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s;
+    border: 1px solid #ccc;
+    font-size: 14px;
 }
 
-.card a:hover {
-    background-color: #0056b3;
+form button,
+button {
+    border: none;
+    background: #28a745;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-/* --- الجداول --- */
+form button:hover,
+button:hover {
+    background: #218838;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin-top: 10px;
+    background: #fff;
 }
 
-table th, table td {
-    padding: 10px;
-    border: 1px solid #ddd;
+th,
+td {
+    border: 1px solid #000;
+    padding: 8px;
     text-align: center;
 }
 
-table th {
-    background-color: #007bff;
-    color: #fff;
-}
-
-/* --- الأزرار --- */
-button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
+.status-paid {
+    color: green;
     font-weight: bold;
-    transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #0056b3;
+.status-unpaid {
+    color: red;
+    font-weight: bold;
 }
 
-/* --- الفوتر --- */
+section.card {
+    background: #fff;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+section.card h2 {
+    margin: 0;
+}
+
 footer {
-    background-color: #333;
-    color: #fff;
     text-align: center;
-    padding: 15px 10px;
-    margin-top: 40px;
+    padding: 15px;
+    background: #007bff;
+    color: #fff;
+    margin-top: 20px;
 }
