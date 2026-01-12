@@ -1,26 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<title>أرشيف الإيصالات - FAST NET</title>
-<link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-<h2>أرشيف الإيصالات</h2>
-<button onclick="goHome()">🏠 العودة للصفحة الرئيسية</button>
-<button onclick="exportReceiptsCSV()">📦 تصدير Excel</button>
-
-<table id="receiptsTable">
-<tr>
-<th>رقم الإيصال</th><th>الاسم</th><th>الهاتف</th><th>المبلغ</th><th>الشهر</th><th>تاريخ الدفع</th><th>المستخدم</th><th>طباعة</th>
-</tr>
-</table>
-
-<script src="assets/js/core.js"></script>
-<script src="assets/js/archive.js"></script>
-<script src="assets/js/exportReceipts.js"></script>
-<script>
-window.onload = updateReceiptsTable;
-</script>
-</body>
-</html>
