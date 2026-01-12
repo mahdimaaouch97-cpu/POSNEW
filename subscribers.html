@@ -66,11 +66,50 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function(){
-    // جلب البيانات القديمة
-    window.subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
 
-    // عرض المشتركين عند تحميل الصفحة
-    renderSubscribers();
+    // التصدير إلى Excel
+    document.getElementById("exportExcelBtn").addEventListener("click", function(){
+        const ws_data = window.subscribers.map(sub => ({
+            "الاسم": sub.name,
+            "العنوان": sub.address || "",
+            "الباقة": sub.package,
+            "سعر الباقة ($)": sub.price || 0,
+            "المبلغ المدفوع ($)": sub.paid.toFixed(2),
+            "المبلغ المتبقي ($)": getRemaining(sub)
+        }));
+        const ws = XLSX.utils.json_to_sheet(ws_data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "المشتركين");
+        XLSX.writeFile(wb, "subscribers.xlsx");
+    });
+
+    // الاستيراد من Excel
+    document.getElementById("importExcel").addEventListener("change", function(e){
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event){
+            const data = new Uint8Array(event.target.result);
+            const workbook = XLSX.read(data, {type:'array'});
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            jsonData.forEach(row=>{
+                window.subscribers.push({
+                    name: row["الاسم"] || "",
+                    address: row["العنوان"] || "",
+                    package: row["الباقة"] || "",
+                    price: parseFloat(row["سعر الباقة ($)"]) || 0,
+                    paid: parseFloat(row["المبلغ المدفوع ($)"]) || 0
+                });
+            });
+            localStorage.setItem("subscribers", JSON.stringify(window.subscribers));
+            renderSubscribers();
+            alert("تم الاستيراد بنجاح!");
+        };
+        reader.readAsArrayBuffer(file);
+    });
 
     // البحث عن اسم المشترك
     window.searchSubscriber = function(){
@@ -94,52 +133,6 @@ document.addEventListener("DOMContentLoaded", function(){
         renderSubscribers();
     }
 
-    // التصدير إلى Excel
-    document.getElementById("exportExcelBtn").addEventListener("click", function(){
-        const ws_data = window.subscribers.map(sub => ({
-            "الاسم": sub.name,
-            "العنوان": sub.address || "",
-            "الباقة": sub.package,
-            "سعر الباقة ($)": sub.price || 0,
-            "المبلغ المدفوع ($)": sub.paid.toFixed(2),
-            "المبلغ المتبقي ($)": getRemaining(sub)
-        }));
-
-        const ws = XLSX.utils.json_to_sheet(ws_data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "المشتركين");
-        XLSX.writeFile(wb, "subscribers.xlsx");
-    });
-
-    // الإستيراد من Excel
-    document.getElementById("importExcel").addEventListener("change", function(e){
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(event){
-            const data = new Uint8Array(event.target.result);
-            const workbook = XLSX.read(data, {type:'array'});
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-            jsonData.forEach(row=>{
-                // دمج البيانات الجديدة مع القديمة
-                window.subscribers.push({
-                    name: row["الاسم"] || "",
-                    address: row["العنوان"] || "",
-                    package: row["الباقة"] || "",
-                    price: parseFloat(row["سعر الباقة ($)"]) || 0,
-                    paid: parseFloat(row["المبلغ المدفوع ($)"]) || 0
-                });
-            });
-
-            localStorage.setItem("subscribers", JSON.stringify(window.subscribers));
-            renderSubscribers();
-            alert("تم الاستيراد بنجاح!");
-        };
-        reader.readAsArrayBuffer(file);
-    });
 });
 </script>
 
