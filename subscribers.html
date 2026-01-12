@@ -5,6 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>المشتركين</title>
 <link rel="stylesheet" href="assets/css/style.css">
+<style>
+/* تنسيق النموذج داخل المشتركين */
+.subscribers-section form {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.subscribers-section form input,
+.subscribers-section form select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    flex: 1 1 200px;
+}
+
+.subscribers-section form button {
+    flex: 0 0 auto;
+}
+</style>
 </head>
 <body>
 <header>
@@ -24,7 +46,15 @@
 
 <main>
 <section class="subscribers-section">
-<button onclick="addSubscriber()">إضافة مشترك جديد</button>
+<h2>إضافة مشترك جديد</h2>
+
+<form id="subscriberForm">
+<input type="text" id="subscriberName" placeholder="اسم المشترك" required>
+<select id="subscriberPackage" required>
+<option value="">اختر الباقة</option>
+</select>
+<button type="submit">إضافة المشترك</button>
+</form>
 
 <table id="subscribersTable">
 <thead>
@@ -45,11 +75,20 @@
 </footer>
 
 <script>
-// تحميل البيانات
+// تحميل البيانات من LocalStorage
 let subscribers = JSON.parse(localStorage.getItem("subscribers")) || [];
 let packages = JSON.parse(localStorage.getItem("packages")) || [];
 
-// عرض المشتركين
+// تعبئة قائمة الباقات
+const packageSelect = document.getElementById("subscriberPackage");
+packages.forEach(pkg => {
+    const option = document.createElement("option");
+    option.value = pkg.name;
+    option.textContent = pkg.name;
+    packageSelect.appendChild(option);
+});
+
+// عرض المشتركين في الجدول
 function renderSubscribers() {
     const tbody = document.querySelector("#subscribersTable tbody");
     tbody.innerHTML = "";
@@ -66,4 +105,46 @@ function renderSubscribers() {
         `;
         tbody.appendChild(row);
     });
-    localSto
+    localStorage.setItem("subscribers", JSON.stringify(subscribers));
+}
+
+// إضافة مشترك جديد عبر النموذج
+document.getElementById("subscriberForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    const name = document.getElementById("subscriberName").value.trim();
+    const pkg = document.getElementById("subscriberPackage").value;
+
+    if(!name || !pkg){
+        alert("يرجى إدخال الاسم واختيار الباقة!");
+        return;
+    }
+
+    subscribers.push({name:name, package:pkg});
+    renderSubscribers();
+    this.reset();
+});
+
+// تعديل مشترك
+function editSubscriber(index){
+    const sub = subscribers[index];
+    const newName = prompt("تعديل اسم المشترك:", sub.name);
+    if(!newName) return;
+    const newPkg = prompt("تعديل الباقة:", sub.package);
+    if(!newPkg) return;
+    subscribers[index] = {name:newName, package:newPkg};
+    renderSubscribers();
+}
+
+// حذف مشترك
+function deleteSubscriber(index){
+    if(confirm("هل تريد حذف هذا المشترك؟")){
+        subscribers.splice(index,1);
+        renderSubscribers();
+    }
+}
+
+// عند تحميل الصفحة
+window.onload = renderSubscribers;
+</script>
+</body>
+</html>
